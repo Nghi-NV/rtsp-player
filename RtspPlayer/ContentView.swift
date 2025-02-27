@@ -31,6 +31,30 @@ struct RTSPPlayerView: UIViewRepresentable {
     }
     
     class Coordinator: NSObject, RTSPClientDelegate {
+        func onRtspStatusConnecting() {
+            print("onRtspStatusConnecting")
+        }
+        
+        func onRtspStatusConnected() {
+            print("onRtspStatusConnected")
+        }
+        
+        func onRtspStatusDisconnected() {
+            print("onRtspStatusDisconnected")
+        }
+        
+        func onRtspStatusFailedUnauthorized() {
+            print("onRtspStatusFailedUnauthorized")
+        }
+        
+        func onRtspStatusFailed(message: String) {
+            print("onRtspStatusFailed")
+        }
+        
+        func onRtspFirstFrameRendered() {
+            print("onRtspFirstFrameRendered")
+        }
+        
         private let parent: RTSPPlayerView
         
         init(_ parent: RTSPPlayerView) {
@@ -66,7 +90,8 @@ struct ContentView: View {
     @State private var password = ""
     @State private var showError = false
     @State private var errorMessage = ""
-    
+    @State private var rtspClient: RTSPClient?
+
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
@@ -142,10 +167,16 @@ struct ContentView: View {
         if !username.isEmpty && !password.isEmpty {
             // Thiết lập thông tin đăng nhập nếu có
         }
+
+        rtspClient = RTSPClient()
+        rtspClient!.setCredentials(username: username, password: password)
+        print("start")
+        rtspClient!.start(url: URL(string: urlString)!)
     }
     
     private func stopPlayback() {
         // Dừng phát video
+        rtspClient?.stop()
     }
     
     private func showError(message: String) {
